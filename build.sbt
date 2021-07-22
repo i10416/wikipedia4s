@@ -21,27 +21,6 @@ inThisBuild(
 )
 
 
-lazy val protocol = project.in(file("protocol"))
-  .enablePlugins(OpenApiGeneratorPlugin)
-  .settings(
-    scalaVersion := scala213,
-    crossScalaVersions := Seq(scala213),
-    openApiInputSpec := (baseDirectory.value /  "openapi.yaml").toString,
-    openApiGeneratorName :="scala-sttp",
-    openApiHttpUserAgent := "wikipedia4s",
-    openApiValidateSpec := SettingDisabled,
-    openApiTemplateDir	:= (baseDirectory.value / "template").toString,
-    openApiGenerateModelTests := SettingEnabled,
-    libraryDependencies ++= Seq(
-     "com.softwaremill.sttp.client" %% "core" % "2.2.9",
-      "com.softwaremill.sttp.client" %% "json4s" % "2.2.9",
-      "org.json4s" %% "json4s-jackson" % "3.6.8"
-    ),
-    openApiIgnoreFileOverride := s"${baseDirectory.in(ThisBuild).value.getPath}/openapi-ignore-file",
-    (compile in Compile) := ((compile in Compile) dependsOn openApiGenerate).value,
-    openApiOutputDir := baseDirectory.value.name,
-    cleanFiles += baseDirectory.value / "src"
-  )
 lazy val root = project
     .in(file("."))
     .settings(
@@ -49,7 +28,7 @@ lazy val root = project
       version := "0.1.0-SNAPSHOT",
       scalaVersion := scala3Version,
       libraryDependencies ++= Dependencies.deps
-    ).dependsOn(protocol)
+    )
 
 lazy val docs = project
     .in(file(".generated_docs"))
