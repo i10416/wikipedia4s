@@ -31,3 +31,7 @@ project/plugins/project/
 .worksheet
 .idea
 .generated_docs
+
+
+protocol/*
+!protocol/openapi.yaml

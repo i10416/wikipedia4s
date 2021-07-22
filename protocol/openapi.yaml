@@ -1,0 +1,100 @@
+openapi: "3.0.0"
+
+info:
+  description: "MediaWiki API"
+  version: "0.1.0"
+  title: "Wikipedia Media Wiki API"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+servers:
+  - url: https://{locale}.wikipedia.org
+    variables:
+      locale:
+        default: en
+        description: locale
+paths:
+  '/w/api.php':
+    parameters:
+      - name: "format"
+        in: "query"
+        description: "format"
+        required: true
+        schema:
+          type: string
+          enum:
+            - json
+    get:
+      summary: "search"
+      description: "search articles"
+      parameters:
+      - name: "srsearch"
+        in: "query"
+        description: "search query"
+        required: true
+        schema:
+          type: string
+      - name: "list"
+        in: "query"
+        description: "search"
+        required: true
+        schema:
+          type: string
+          default: "search"
+      - name: "srprop"
+        in: "query"
+        description: "search limit"
+        required: true
+        schema:
+          type: string
+      - name: "srlimit"
+        in: "query"
+        description: "search limit"
+        required: true
+        schema:
+          type: int
+          format: int64
+          default: 10
+      responses:
+        200:
+          description: "response on search success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+components:
+  schemas:
+    SearchResponse:
+      type: object
+      required: 
+        - query
+      properties:
+        query:
+          type: object
+          required:
+            - searchinfo
+            - search
+          properties:
+            searchinfo:
+              type: object
+              properties:
+                totalhits:
+                  type: integer
+                  format: int64
+            search:
+              type: array
+              items:
+                $ref : '#/components/schemas/SearchResult'
+    SearchResult:
+      type: object
+      required:
+        - title
+        - pageid
+      properties:
+        title:
+          type: string
+        pageid:
+          type: integer
+          format: int64
+
+          
