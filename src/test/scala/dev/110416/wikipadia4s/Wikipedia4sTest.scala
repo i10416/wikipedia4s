@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import scala.concurrent.duration._
 class Test extends AnyFlatSpec with Matchers:
     implicit val ctx: APIContext = APIContext("ja")
-    ctx.language="en"
+    ctx.language = "en"
     val wiki = new Wikipedia4s {}
     import cats.effect.unsafe.implicits.global
 
