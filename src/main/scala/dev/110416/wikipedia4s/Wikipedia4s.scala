@@ -22,7 +22,7 @@ import sttp.model.Method
 trait Wikipedia4s(using ctx: APIContext) {
     val client =  org.openapitools.client.api
             .DefaultApi(ctx.uri("http")(ctx.language))
-            
+
     def search(
         query: String,
         limit: Int = 10
@@ -67,7 +67,8 @@ trait Wikipedia4s(using ctx: APIContext) {
     ]]
 
     private def searchRequest(query: String, limit: Int = 10): IO[SearchRequestResponse] = {
-        val req = client.wApiPhpGet(
+        import org.openapitools.client.core.JsonSupport.*
+        val req = client.wApiPhpGet[org.openapitools.client.model.SearchResponse](
               ctx.USER_AGENT,
               "json",
               "query",

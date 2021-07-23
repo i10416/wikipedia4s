@@ -19,7 +19,7 @@ class {{classname}}(baseUrl: String) {
 {{#javadocRenderer}}
 {{>javadoc}}
 {{/javadocRenderer}}
-  def {{operationId}}({{>methodParameters}},params:Map[String,String]=Map()): RequestT[Identity,{{#separateErrorChannel}}Either[ResponseException[String, io.circe.Error],ErrorResponse | {{>operationReturnType}}]{{/separateErrorChannel}}{{^separateErrorChannel}}{{>operationReturnType}}{{/separateErrorChannel}}, Any] =
+  def {{operationId}}[T:io.circe.Decoder]({{>methodParameters}},params:Map[String,String]=Map()): RequestT[Identity,{{#separateErrorChannel}}Either[ResponseException[String, io.circe.Error],ErrorResponse | T ]{{/separateErrorChannel}}{{^separateErrorChannel}}{{>operationReturnType}}{{/separateErrorChannel}}, Any] =
     basicRequest
       .method(Method.{{httpMethod.toUpperCase}}, uri"$baseUrl{{{path}}}{{#queryParams.0}}?{{#queryParams}}{{baseName}}=${ {{{paramName}}} }{{^-last}}&{{/-last}}{{/queryParams}}{{/queryParams.0}}{{#isApiKey}}{{#isKeyInQuery}}{{^queryParams.0}}?{{/queryParams.0}}{{#queryParams.0}}&{{/queryParams.0}}{{keyParamName}}=${apiKey.value}&{{/isKeyInQuery}}{{/isApiKey}}".addParams(params))
       .contentType({{#consumes.0}}"{{{mediaType}}}"{{/consumes.0}}{{^consumes}}"application/json"{{/consumes}}){{#headerParams}}
@@ -35,7 +35,7 @@ class {{classname}}(baseUrl: String) {
         {{>paramMultipartCreation}}{{^-last}}, {{/-last}}{{/formParams}}
       ).flatten){{/isMultipart}}{{/formParams.0}}{{#bodyParam}}
       .body({{paramName}}){{/bodyParam}}
-      .response({{#separateErrorChannel}}fromMetadata(asJson{{/separateErrorChannel}}{{^separateErrorChannel}}asJsonAlwaysUnsafe{{/separateErrorChannel}}[ErrorResponse], ConditionalResponseAs(_.code==StatusCode.Ok,asJson[{{>operationReturnType}}])))
+      .response({{#separateErrorChannel}}fromMetadata(asJson{{/separateErrorChannel}}{{^separateErrorChannel}}asJsonAlwaysUnsafe{{/separateErrorChannel}}[ErrorResponse], ConditionalResponseAs(_.code==StatusCode.Ok,asJson[T])))
 
 {{/operation}}
 }
