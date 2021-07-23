@@ -96,4 +96,26 @@ components:
           properties:
             info:
               type: string
+    GeoSearchResponse:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: object
+          properties:
+            geosearch:
+              type: array
+              items:
+                $ref : '#/components/schemas/GeoSearch'
+    GeoSearch:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+      
 
+            
+            
