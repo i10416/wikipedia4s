@@ -111,3 +111,16 @@ components:
         pageid:
           type: integer
           format: int64
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - info
+          properties:
+            info:
+              type: string
+

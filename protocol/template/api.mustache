@@ -4,9 +4,10 @@ package {{package}}
 {{#imports}}
 import {{import}}
 {{/imports}}
+import org.openapitools.client.model.ErrorResponse
 import {{invokerPackage}}.JsonSupport._
 import sttp.client3._
-import sttp.model.Method
+import sttp.model.{Method,StatusCode}
 
 {{#operations}}
 object {{classname}} {
@@ -18,7 +19,7 @@ class {{classname}}(baseUrl: String) {
 {{#javadocRenderer}}
 {{>javadoc}}
 {{/javadocRenderer}}
-  def {{operationId}}({{>methodParameters}}): RequestT[Identity,{{#separateErrorChannel}}Either[ResponseException[String, io.circe.Error], {{>operationReturnType}}]{{/separateErrorChannel}}{{^separateErrorChannel}}{{>operationReturnType}}{{/separateErrorChannel}}, Any] =
+  def {{operationId}}({{>methodParameters}}): RequestT[Identity,{{#separateErrorChannel}}Either[ResponseException[String, io.circe.Error],ErrorResponse | {{>operationReturnType}}]{{/separateErrorChannel}}{{^separateErrorChannel}}{{>operationReturnType}}{{/separateErrorChannel}}, Any] =
     basicRequest
       .method(Method.{{httpMethod.toUpperCase}}, uri"$baseUrl{{{path}}}{{#queryParams.0}}?{{#queryParams}}{{baseName}}=${ {{{paramName}}} }{{^-last}}&{{/-last}}{{/queryParams}}{{/queryParams.0}}{{#isApiKey}}{{#isKeyInQuery}}{{^queryParams.0}}?{{/queryParams.0}}{{#queryParams.0}}&{{/queryParams.0}}{{keyParamName}}=${apiKey.value}&{{/isKeyInQuery}}{{/isApiKey}}")
       .contentType({{#consumes.0}}"{{{mediaType}}}"{{/consumes.0}}{{^consumes}}"application/json"{{/consumes}}){{#headerParams}}
@@ -34,7 +35,7 @@ class {{classname}}(baseUrl: String) {
         {{>paramMultipartCreation}}{{^-last}}, {{/-last}}{{/formParams}}
       ).flatten){{/isMultipart}}{{/formParams.0}}{{#bodyParam}}
       .body({{paramName}}){{/bodyParam}}
-      .response({{#separateErrorChannel}}asJson{{/separateErrorChannel}}{{^separateErrorChannel}}asJsonAlwaysUnsafe{{/separateErrorChannel}}[{{>operationReturnType}}])
+      .response({{#separateErrorChannel}}fromMetadata(asJson{{/separateErrorChannel}}{{^separateErrorChannel}}asJsonAlwaysUnsafe{{/separateErrorChannel}}[ErrorResponse], ConditionalResponseAs(_.code==StatusCode.Ok,asJson[{{>operationReturnType}}])))
 
 {{/operation}}
 }
