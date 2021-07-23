@@ -3,10 +3,10 @@ import cats.data.EitherT
 import cats.effect.IO
 import cats.implicits.*
 import dev.`110416`.wikipedia4s.errors.*
-import io.circe.Json
-import io.circe.parser._
 import sttp.client3.DeserializationException
 import sttp.client3.HttpError
+import sttp.client3.Identity
+import sttp.client3.RequestT
 import sttp.client3.Response
 import sttp.client3.ResponseException
 import sttp.client3.SttpBackend
@@ -16,9 +16,8 @@ import sttp.client3.basicRequest
 import sttp.model.Method
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
-import sttp.client3.Identity
+
 import scala.concurrent.duration.*
-import sttp.client3.RequestT
 
 type APIRequest[T] = RequestT[Identity, Either[
   ResponseException[String, io.circe.Error],
@@ -33,8 +32,7 @@ trait Wikipedia4s(using ctx: APIContext) {
     implicit val client: org.openapitools.client.api.DefaultApi = org.openapitools.client.api
         .DefaultApi(ctx.uri("http")(ctx.language))
 
-
-    def query[T <: HasExpectResponseType : BuildRequest](
+    def query[T <: HasResponseType : BuildRequest](
         q: T
     ): IO[Either[WikiError, q.ResponseType]] = {
         AsyncHttpClientCatsBackend[IO]().flatMap { backend =>
@@ -43,16 +41,6 @@ trait Wikipedia4s(using ctx: APIContext) {
                     response <- summon[BuildRequest[T]].build(q).send(backend)
                 } yield parseResponse(response)
             }
-        }
-    }
-
-    /// pretty print response in console
-
-    def execute(command: Command): IO[Unit] = {
-        command match {
-            case Command.Search(query, limit)  => ???
-            case Command.Suggest(query, limit) => ???
-            case Command.Help                  => ???
         }
     }
 

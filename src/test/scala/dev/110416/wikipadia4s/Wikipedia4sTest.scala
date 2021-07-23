@@ -13,7 +13,7 @@ class Test extends AnyFlatSpec with Matchers:
         case Right(result) => println(result)
         case Left(fail)    => println(fail)
     }  
-    wiki.query(Query.GeoSearch((37.789,-122.4),500,10)).unsafeRunSync() match {
+    wiki.query(Query.GeoSearch((37.789,-122.4),500,10,Some("wikipedia"),Some(Seq("coordinates")))).unsafeRunSync() match {
         case Right(result) => println(result)
         case Left(fail)    => println(fail)
     }

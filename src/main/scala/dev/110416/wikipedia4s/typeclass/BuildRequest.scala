@@ -2,7 +2,7 @@ package dev.`110416`.wikipedia4s
 import scala.concurrent.duration.*
 
 
-trait BuildRequest[T <: HasExpectResponseType] {
+trait BuildRequest[T <: HasResponseType] {
     def build(t: T)(using
         client: org.openapitools.client.api.DefaultApi,
         ctx: APIContext
@@ -44,7 +44,9 @@ given BuildRequest[Query.GeoSearch] with
                 "gsradius" -> q.radius.toString,
                 "list" -> "geosearch",
                 "gscoord"-> s"${q.location._1}|${q.location._2}",
-                "gslimit" -> q.limit.toString
+                "gslimit" -> q.limit.toString,
+                "gsprop"-> q.props.getOrElse(Seq()).mkString(","),
+                "titles" -> q.titles.getOrElse("")
               )
             )
             .readTimeout(5.seconds)

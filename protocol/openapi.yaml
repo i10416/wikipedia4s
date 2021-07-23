@@ -108,12 +108,42 @@ components:
               type: array
               items:
                 $ref : '#/components/schemas/GeoSearch'
+            pages:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/GeoSearchPages'
+                  
     GeoSearch:
       type: object
       required:
         - title
       properties:
         title:
+          type: string
+    GeoSearchPages:
+      type: object
+      properties:
+        pageid:
+          type: string
+        ns:
+          type: int
+          format: int64
+        title:
+          type: string
+        coordinates:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeoCoordinates'
+    GeoCoordinates:
+      type: object
+      properties:
+        lat:
+          type: float
+        lon:
+          type: float
+        primary:
+          type: string
+        globe:
           type: string
       
 

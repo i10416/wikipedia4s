@@ -17,8 +17,11 @@ cd repo
 sbt
 ```
 
+Add openapi.yaml,update `src/main/scala/dev/110416/commands`  and  `src/main/scala/dev/110416/typeclass` typeclass.
+
 On compilation, a client implementation and models are generated from protocol/openapi.yaml under the protocol directory.
 
 ### Supporting APIs
 
-- wip
+- Search
+- GeoSearch
