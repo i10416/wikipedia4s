@@ -1,79 +1,74 @@
 package dev.`110416`.wikipedia4s
-import cats.implicits.*
-import cats.effect.IO
 import cats.data.EitherT
-import sttp.client3.SttpClientException
-import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
-import scala.concurrent.duration.*
-import sttp.client3.SttpBackend
-import sttp.client3.Response
-import sttp.model.Uri.UriContext
-import sttp.client3.basicRequest
-import sttp.model.Uri
+import cats.effect.IO
+import cats.implicits.*
+import dev.`110416`.wikipedia4s.errors.*
 import io.circe.Json
 import io.circe.parser._
-
-import dev.`110416`.wikipedia4s.errors.*
+import sttp.client3.DeserializationException
+import sttp.client3.HttpError
+import sttp.client3.Response
 import sttp.client3.ResponseException
+import sttp.client3.SttpBackend
+import sttp.client3.SttpClientException
+import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
+import sttp.client3.basicRequest
+import sttp.model.Uri
+import sttp.model.Uri.UriContext
+
+import scala.concurrent.duration.*
 
 trait Wikipedia4s(using ctx: APIContext) extends APIProtocol {
 
-    def query(keyword: String, limit: Int): IO[Either[WikiError, Seq[SearchResult]]] = {
-        val response = request(
-          Map(
-            "srsearch" -> keyword,
-            "srlimit" -> limit.toString,
-            "srprop" -> "",
-            "list" -> "search"
-          )
-        )
-        val r = for {
-            json <- EitherT(response)
-            result <- parseJson(json).toEitherT
-        } yield result
-        r.value
-    }
+    /// pretty print response in console
 
-    private def parseJson(json: Json): Either[WikiError, Seq[SearchResult]] = {
-        println(json.show)
-        json.hcursor
-            .as[WikiResponse.SearchResponse]
-            .recoverWith { case _ => json.hcursor.as[WikiResponse.WikipediaError] } match {
-            case Right(WikiResponse.SearchResponse(SearchQuery(searchInfo, searchResults))) =>
-                Right(searchResults)
-            case Right(WikiResponse.WikipediaError(ErrorInfo(_))) => Left(WikiError.ServerError)
-            case Left(f) => Left(WikiError.ParseError(f.getMessage))
+    def execute(command: Command): IO[Unit] = {
+        command match {
+            case Command.Search(query, limit)  => ???
+            case Command.Suggest(query, limit) => ???
+            case Command.Help                  => ???
         }
     }
 
-    def request(params: Map[String, String]): IO[Either[WikiError, Json]] = {
-        val req = basicRequest.get(ctx.uri(ctx.language)(sharedParams ++ params)).readTimeout(3.seconds)
-        AsyncHttpClientCatsBackend[IO]().flatMap { backend =>
-            {
-                for {
-                    response <- req.send(backend)
-                } yield for {
-                    j <- parseResponse(response)
-                } yield j
+    private def parseSearchResponse(
+        response: SearchRequestResponse
+    ): Either[WikiError, Seq[org.openapitools.client.model.SearchResult]] = {
+        response.body.leftMap(handleCommonError) match {
+            case Right(searchResponse: org.openapitools.client.model.SearchResponse) =>
+                Right(searchResponse.query.search)
+            case Right(searchResponse: org.openapitools.client.model.ErrorResponse) =>
+                Left(WikiError.ApplicationError(searchResponse.error.info))
+            case Left(err) => Left(err)
+        }
 
-            }
+    }
+
+    private def handleCommonError(err: ResponseException[String, io.circe.Error]): WikiError = {
+        err match {
+            case HttpError(body, statusCode) if statusCode.isClientError =>
+                WikiError.InvalidRequestError(body)
+            case HttpError(_, _)                     => WikiError.ServerError
+            case DeserializationException(body, err) => WikiError.ParseError(body)
         }
     }
-    private def parseResponse(
-        response: Response[Either[String, String]]
-    ): Either[WikiError, Json] = {
-        response match {
-            case Response(Left(_), statusCode, statusText, _, _, requestmetainfo)
-                if statusCode.isClientError =>
-                Left(WikiError.InvalidRequestError(statusText))
-            case Response(Left(_), _, _, _, _, _) =>
-                Left(WikiError.ServerError)
-            case Response(Right(body), _, _, _, _, _) =>
-                parse(body).leftMap(f => WikiError.ParseError(f.message))
-        }
+
+    def search(
+        query: String,
+        limit: Int = 10
+    ): IO[Either[WikiError, Seq[org.openapitools.client.model.SearchResult]]] = {
+        searchRequest(query, limit).map(parseSearchResponse)
     }
-    def requestV2():IO[Response[Either[ResponseException[String, io.circe.Error], org.openapitools.client.model.SearchResponse]]]={
-        val req = org.openapitools.client.api.DefaultApi().wApiPhpGet("json","query","wikipedia","search","",10).readTimeout(5.seconds)
+
+    type SearchRequestResponse = Response[Either[
+      ResponseException[String, io.circe.Error],
+      org.openapitools.client.model.ErrorResponse | org.openapitools.client.model.SearchResponse
+    ]]
+
+    private def searchRequest(query: String, limit: Int = 10): IO[SearchRequestResponse] = {
+        val req = org.openapitools.client.api
+            .DefaultApi(ctx.uri("http")(ctx.language))
+            .wApiPhpGet(ctx.USER_AGENT, "json", "query", query, "search", "", limit)
+            .readTimeout(5.seconds)
         AsyncHttpClientCatsBackend[IO]().flatMap { backend =>
             {
                 for {

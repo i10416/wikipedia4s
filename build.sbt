@@ -14,7 +14,8 @@ inThisBuild(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
     versionScheme := Some("early-semver"),
-    crossScalaVersions ++= Seq(scala3Version, scala213)
+    crossScalaVersions ++= Seq(scala3Version, scala213),
+    libraryDependencies ++= sharedDependencies
   )
 )
 val circeVersion = "0.14.1"
@@ -32,13 +33,6 @@ lazy val protocol = project
       openApiHttpUserAgent := "wikipedia4s",
       openApiValidateSpec := SettingDisabled,
       openApiGenerateModelTests := SettingEnabled,
-      libraryDependencies ++= Seq(
-        "com.softwaremill.sttp.client3" %% "core" % "3.3.11",
-        "com.softwaremill.sttp.client3" %% "circe" % "3.3.11",
-        "io.circe" %% "circe-core" % circeVersion,
-        "io.circe" %% "circe-generic" % circeVersion,
-        "io.circe" %% "circe-parser" % circeVersion
-      ),
       openApiIgnoreFileOverride := s"${baseDirectory.in(ThisBuild).value.getPath}/.openapiignore",
       (compile in Compile) := ((compile in Compile) dependsOn openApiGenerate).value,
       openApiOutputDir := baseDirectory.value.name,
