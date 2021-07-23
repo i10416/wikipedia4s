@@ -4,10 +4,20 @@
 ```scala
 implicit val ctx: APIContext = APIContext("en")
 val wiki = new Wikipedia4s {}
-wiki.search("wikipedia", 10).unsafeRunSync() match {
-        case Right(result) => println(result)
-        case Left(fail)    => println(fail)
-    }
+wiki.query(Query.Suggest("helloworld", 5)).unsafeRunSync() match {
+    case Right(result) => println(result)
+    case Left(fail)    => println(fail)
+}
+
+wiki.query(Query.Search("helloworld", 5)).unsafeRunSync() match {
+    case Right(result) => println(result)
+    case Left(fail)    => println(fail)
+}
+
+wiki.query(Query.GeoSearch((37.789, -122.4), 500, 10, Some("wikipedia"))).unsafeRunSync() match {
+    case Right(result) => println(result)
+    case Left(fail)    => println(fail)
+}
 ```
 ### How to Develop
 
@@ -17,7 +27,7 @@ cd repo
 sbt
 ```
 
-Add openapi.yaml,update `src/main/scala/dev/110416/commands`  and  `src/main/scala/dev/110416/typeclass` typeclass.
+Add openapi.yaml, update `src/main/scala/dev/110416/commands`  and  `src/main/scala/dev/110416/typeclass` typeclass.
 
 On compilation, a client implementation and models are generated from protocol/openapi.yaml under the protocol directory.
 
@@ -25,3 +35,4 @@ On compilation, a client implementation and models are generated from protocol/o
 
 - Search
 - GeoSearch
+- Suggest
