@@ -19,6 +19,8 @@ wiki.query(Query.GeoSearch((37.789, -122.4), 500, 10, Some("wikipedia"))).unsafe
     case Left(fail)    => println(fail)
 }
 ```
+
+Inspired by https://github.com/goldsmith/Wikipedia and https://github.com/intracer/scalawiki
 ### How to Develop
 
 ```shell
@@ -36,3 +38,4 @@ On compilation, a client implementation and models are generated from protocol/o
 - Search
 - GeoSearch
 - Suggest
+
