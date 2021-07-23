@@ -1,0 +1,4 @@
+{
+  "jsonLibrary": "circe",
+  "sttpClientVersion": "3.3.11"
+}

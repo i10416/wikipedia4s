@@ -14,6 +14,7 @@ import io.circe.Json
 import io.circe.parser._
 
 import dev.`110416`.wikipedia4s.errors.*
+import sttp.client3.ResponseException
 
 trait Wikipedia4s(using ctx: APIContext) extends APIProtocol {
 
@@ -46,8 +47,7 @@ trait Wikipedia4s(using ctx: APIContext) extends APIProtocol {
     }
 
     def request(params: Map[String, String]): IO[Either[WikiError, Json]] = {
-        val req =
-            basicRequest.get(ctx.uri(ctx.language)(sharedParams ++ params))
+        val req = basicRequest.get(ctx.uri(ctx.language)(sharedParams ++ params)).readTimeout(3.seconds)
         AsyncHttpClientCatsBackend[IO]().flatMap { backend =>
             {
                 for {
@@ -70,6 +70,16 @@ trait Wikipedia4s(using ctx: APIContext) extends APIProtocol {
                 Left(WikiError.ServerError)
             case Response(Right(body), _, _, _, _, _) =>
                 parse(body).leftMap(f => WikiError.ParseError(f.message))
+        }
+    }
+    def requestV2():IO[Response[Either[ResponseException[String, io.circe.Error], org.openapitools.client.model.SearchResponse]]]={
+        val req = org.openapitools.client.api.DefaultApi().wApiPhpGet("json","query","wikipedia","search","",10).readTimeout(5.seconds)
+        AsyncHttpClientCatsBackend[IO]().flatMap { backend =>
+            {
+                for {
+                    response <- req.send(backend)
+                } yield response
+            }
         }
     }
 }

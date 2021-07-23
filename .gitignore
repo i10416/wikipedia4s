@@ -35,3 +35,5 @@ project/plugins/project/
 
 protocol/*
 !protocol/openapi.yaml
+!protocol/openapi_config.json
+!protocol/template/

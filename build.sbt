@@ -10,17 +10,40 @@ inThisBuild(
     scalacOptions ++= Seq(
       "-deprecation"
     ),
-    
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
     versionScheme := Some("early-semver"),
-    crossScalaVersions++= Seq(scala3Version,scala213),
-    //scalacOptions ++= Seq("-Xmax-inlines", "50")
+    crossScalaVersions ++= Seq(scala3Version, scala213)
   )
 )
+val circeVersion = "0.14.1"
 
-
+lazy val protocol = project
+    .in(file("protocol"))
+    .enablePlugins(OpenApiGeneratorPlugin)
+    .settings(
+      scalaVersion := scala3Version,
+      crossScalaVersions := Seq(scala3Version),
+      openApiInputSpec := (baseDirectory.value / "openapi.yaml").toString,
+      openApiConfigFile := (baseDirectory.value / "openapi_config.json").toString,
+      openApiTemplateDir := (baseDirectory.value / "template").toString,
+      openApiGeneratorName := "scala-sttp",
+      openApiHttpUserAgent := "wikipedia4s",
+      openApiValidateSpec := SettingDisabled,
+      openApiGenerateModelTests := SettingEnabled,
+      libraryDependencies ++= Seq(
+        "com.softwaremill.sttp.client3" %% "core" % "3.3.11",
+        "com.softwaremill.sttp.client3" %% "circe" % "3.3.11",
+        "io.circe" %% "circe-core" % circeVersion,
+        "io.circe" %% "circe-generic" % circeVersion,
+        "io.circe" %% "circe-parser" % circeVersion
+      ),
+      openApiIgnoreFileOverride := s"${baseDirectory.in(ThisBuild).value.getPath}/.openapiignore",
+      (compile in Compile) := ((compile in Compile) dependsOn openApiGenerate).value,
+      openApiOutputDir := baseDirectory.value.name,
+      cleanFiles += baseDirectory.value / "src"
+    )
 lazy val root = project
     .in(file("."))
     .settings(
@@ -29,6 +52,8 @@ lazy val root = project
       scalaVersion := scala3Version,
       libraryDependencies ++= Dependencies.deps
     )
+    .aggregate(protocol)
+    .dependsOn(protocol)
 
 lazy val docs = project
     .in(file(".generated_docs"))
