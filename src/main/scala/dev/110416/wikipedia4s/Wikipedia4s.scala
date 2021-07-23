@@ -17,8 +17,18 @@ import sttp.model.Uri
 import sttp.model.Uri.UriContext
 
 import scala.concurrent.duration.*
+import sttp.model.Method
 
 trait Wikipedia4s(using ctx: APIContext) {
+    val client =  org.openapitools.client.api
+            .DefaultApi(ctx.uri("http")(ctx.language))
+            
+    def search(
+        query: String,
+        limit: Int = 10
+    ): IO[Either[WikiError, org.openapitools.client.model.SearchResponse]] = {
+        searchRequest(query, limit).map(parseSearchResponse)
+    }
 
     /// pretty print response in console
 
@@ -40,7 +50,6 @@ trait Wikipedia4s(using ctx: APIContext) {
                 Left(WikiError.ApplicationError(searchResponse.error.info))
             case Left(err) => Left(err)
         }
-
     }
 
     private def handleCommonError(err: ResponseException[String, io.circe.Error]): WikiError = {
@@ -52,22 +61,18 @@ trait Wikipedia4s(using ctx: APIContext) {
         }
     }
 
-    def search(
-        query: String,
-        limit: Int = 10
-    ): IO[Either[WikiError, org.openapitools.client.model.SearchResponse]] = {
-        searchRequest(query, limit).map(parseSearchResponse)
-    }
-
     type SearchRequestResponse = Response[Either[
       ResponseException[String, io.circe.Error],
       org.openapitools.client.model.ErrorResponse | org.openapitools.client.model.SearchResponse
     ]]
 
     private def searchRequest(query: String, limit: Int = 10): IO[SearchRequestResponse] = {
-        val req = org.openapitools.client.api
-            .DefaultApi(ctx.uri("http")(ctx.language))
-            .wApiPhpGet(ctx.USER_AGENT, "json", "query", query, "search", "", limit)
+        val req = client.wApiPhpGet(
+              ctx.USER_AGENT,
+              "json",
+              "query",
+              Map("srsearch" -> query, "list" -> "search", "srprop" -> "", "srlimit" -> "10")
+            )
             .readTimeout(5.seconds)
         AsyncHttpClientCatsBackend[IO]().flatMap { backend =>
             {

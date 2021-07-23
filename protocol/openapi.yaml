@@ -39,37 +39,10 @@ paths:
           type: string
           enum:
             - query
+            
     get:
-      summary: "search"
-      description: "search articles"
-      parameters:
-      - name: "srsearch"
-        in: "query"
-        description: "search query"
-        required: true
-        schema:
-          type: string
-      - name: "list"
-        in: "query"
-        description: "search"
-        required: true
-        schema:
-          type: string
-          default: "search"
-      - name: "srprop"
-        in: "query"
-        description: "search limit"
-        required: true
-        schema:
-          type: string
-      - name: "srlimit"
-        in: "query"
-        description: "search limit"
-        required: true
-        schema:
-          type: int
-          format: int64
-          default: 10
+      summary: "request"
+      description: "request"
       responses:
         200:
           description: "response on search success"
