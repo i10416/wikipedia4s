@@ -18,7 +18,7 @@ import sttp.model.Uri.UriContext
 
 import scala.concurrent.duration.*
 
-trait Wikipedia4s(using ctx: APIContext) extends APIProtocol {
+trait Wikipedia4s(using ctx: APIContext) {
 
     /// pretty print response in console
 
@@ -32,10 +32,10 @@ trait Wikipedia4s(using ctx: APIContext) extends APIProtocol {
 
     private def parseSearchResponse(
         response: SearchRequestResponse
-    ): Either[WikiError, Seq[org.openapitools.client.model.SearchResult]] = {
+    ): Either[WikiError, org.openapitools.client.model.SearchResponse] = {
         response.body.leftMap(handleCommonError) match {
             case Right(searchResponse: org.openapitools.client.model.SearchResponse) =>
-                Right(searchResponse.query.search)
+                Right(searchResponse)
             case Right(searchResponse: org.openapitools.client.model.ErrorResponse) =>
                 Left(WikiError.ApplicationError(searchResponse.error.info))
             case Left(err) => Left(err)
@@ -55,7 +55,7 @@ trait Wikipedia4s(using ctx: APIContext) extends APIProtocol {
     def search(
         query: String,
         limit: Int = 10
-    ): IO[Either[WikiError, Seq[org.openapitools.client.model.SearchResult]]] = {
+    ): IO[Either[WikiError, org.openapitools.client.model.SearchResponse]] = {
         searchRequest(query, limit).map(parseSearchResponse)
     }
 
