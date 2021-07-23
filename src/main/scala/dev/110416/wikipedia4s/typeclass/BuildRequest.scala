@@ -31,12 +31,34 @@ given BuildRequest[Query.Search] with
             .readTimeout(5.seconds)
 
     }
+
+given BuildRequest[Query.Suggest] with
+    def build(
+        q: Query.Suggest
+    )(using client: org.openapitools.client.api.DefaultApi, ctx: APIContext) = {
+        import org.openapitools.client.core.JsonSupport.*
+
+        client
+            .wApiPhpGet[q.ResponseType](
+              ctx.USER_AGENT,
+              "json",
+              "query",
+              Map(
+                "srsearch" -> q.query,
+                "list" -> "search",
+                "srprop" -> "suggestion",
+                "srlimit" -> q.limit.toString
+              )
+            )
+            .readTimeout(5.seconds)
+
+    }
 given BuildRequest[Query.GeoSearch] with
   def build(q:Query.GeoSearch)(using client: org.openapitools.client.api.DefaultApi, ctx: APIContext) = {
         import org.openapitools.client.core.JsonSupport.*
 
         client
-            .wApiPhpGet[org.openapitools.client.model.GeoSearchResponse](
+            .wApiPhpGet[q.ResponseType](
               ctx.USER_AGENT,
               "json",
               "query",
@@ -45,7 +67,6 @@ given BuildRequest[Query.GeoSearch] with
                 "list" -> "geosearch",
                 "gscoord"-> s"${q.location._1}|${q.location._2}",
                 "gslimit" -> q.limit.toString,
-                "gsprop"-> q.props.getOrElse(Seq()).mkString(","),
                 "titles" -> q.titles.getOrElse("")
               )
             )

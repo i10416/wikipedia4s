@@ -8,13 +8,14 @@ class Test extends AnyFlatSpec with Matchers:
 
     implicit val ctx: APIContext = APIContext("en")
     val wiki = new Wikipedia4s {}
-   
-    wiki.query(Query.Search("test",5)).unsafeRunSync() match {
-        case Right(result) => println(result)
-        case Left(fail)    => println(fail)
-    }  
-    wiki.query(Query.GeoSearch((37.789,-122.4),500,10,Some("wikipedia"),Some(Seq("coordinates")))).unsafeRunSync() match {
+
+    wiki.query(Query.Suggest("test", 5)).unsafeRunSync() match {
         case Right(result) => println(result)
         case Left(fail)    => println(fail)
     }
-
+    wiki.query(
+      Query.GeoSearch((37.789, -122.4), 500, 10, Some("wikipedia"), Some(Seq("coordinates")))
+    ).unsafeRunSync() match {
+        case Right(result) => println(result)
+        case Left(fail)    => println(fail)
+    }

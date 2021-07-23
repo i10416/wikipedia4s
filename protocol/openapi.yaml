@@ -96,6 +96,25 @@ components:
           properties:
             info:
               type: string
+    SuggestResponse:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: object
+          $ref: '#/components/schemas/SearchInfo'
+    SearchInfo:
+      type: object
+      required:
+        - searchinfo
+      properties:
+        searchinfo:
+          type: object
+          properties:
+            suggestion:
+              type: string
+
     GeoSearchResponse:
       type: object
       required:
@@ -107,27 +126,26 @@ components:
             geosearch:
               type: array
               items:
-                $ref : '#/components/schemas/GeoSearch'
+                $ref : '#/components/schemas/GeoSearchItem'
             pages:
               type: object
               additionalProperties:
                 $ref: '#/components/schemas/GeoSearchPages'
                   
-    GeoSearch:
+    GeoSearchItem:
       type: object
-      required:
-        - title
       properties:
         title:
           type: string
+        pageid:
+          type: int
     GeoSearchPages:
       type: object
       properties:
         pageid:
-          type: string
+          type: int
         ns:
           type: int
-          format: int64
         title:
           type: string
         coordinates:
