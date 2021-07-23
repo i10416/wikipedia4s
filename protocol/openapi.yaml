@@ -16,6 +16,13 @@ servers:
 paths:
   '/w/api.php':
     parameters:
+      - name: User-Agent
+        in: header
+        required: true
+        schema:
+          type: string
+          enum:
+            - "Wikipedia4s/0.1.0 (https://github.com/ItoYo16u/wikipedia4s)"
       - name: "format"
         in: "query"
         description: "format"
