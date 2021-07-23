@@ -65,10 +65,7 @@ components:
           properties:
             searchinfo:
               type: object
-              properties:
-                totalhits:
-                  type: integer
-                  format: int64
+              $ref: '#/components/schemas/SearchInfo'
             search:
               type: array
               items:
@@ -103,17 +100,17 @@ components:
       properties:
         query:
           type: object
-          $ref: '#/components/schemas/SearchInfo'
+          properties:
+            searchinfo:
+              type: object
+              $ref: '#/components/schemas/SearchInfo'
     SearchInfo:
       type: object
-      required:
-        - searchinfo
       properties:
-        searchinfo:
-          type: object
-          properties:
-            suggestion:
-              type: string
+        suggestion:
+          type: string
+        totalhits:
+          type: int
 
     GeoSearchResponse:
       type: object

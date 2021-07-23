@@ -9,7 +9,7 @@ class Test extends AnyFlatSpec with Matchers:
     implicit val ctx: APIContext = APIContext("en")
     val wiki = new Wikipedia4s {}
 
-    wiki.query(Query.Suggest("test", 5)).unsafeRunSync() match {
+    wiki.query(Query.Suggest("helloworld", 5)).unsafeRunSync() match {
         case Right(result) => println(result)
         case Left(fail)    => println(fail)
     }
