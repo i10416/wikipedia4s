@@ -38,8 +38,7 @@ paths:
         schema:
           type: string
           enum:
-            - query
-            
+            - query            
     get:
       summary: "request"
       description: "request"
@@ -50,6 +49,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchResponse'
+  /w/api.php/rest_v1/page/summary/{pagename}:
+    get:
+      summary: get page from page_name
+      parameters:
+        - in: path
+          name: pagename
+          schema:
+            type: string
+          required: true
 components:
   schemas:
     SearchResponse:
