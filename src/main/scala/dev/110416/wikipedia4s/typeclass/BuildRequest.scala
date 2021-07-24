@@ -70,3 +70,23 @@ given BuildRequest[Query.GeoSearch] with
             )
             .readTimeout(5.seconds)
     }
+
+given BuildRequest[Query.MetaInfo] with
+    def build(
+        q: Query.MetaInfo
+    )(using client: DefaultApi, ctx: APIContext) = {
+
+        client
+            .wApiPhpGet[q.ResponseType](
+              ctx.USER_AGENT,
+              "json",
+              "query",
+              Map(
+                "meta" -> "siteinfo",
+                "formatversion" -> "2",
+                "siprop" -> q.options.map(_.toString.toLowerCase).mkString("|")
+              )
+            )
+            .readTimeout(5.seconds)
+
+    }

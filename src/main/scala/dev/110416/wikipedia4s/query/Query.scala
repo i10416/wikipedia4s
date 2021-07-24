@@ -2,6 +2,7 @@ package dev.`110416`.wikipedia4s
 
 import org.openapitools.client.model.{ GeoSearchResponse, SearchResponse }
 import org.openapitools.client.model.SuggestResponse
+import org.openapitools.client.model.MetaInfoResponse
 
 trait HasResponseType {
     type ResponseType
@@ -25,4 +26,15 @@ object Query {
         with HasResponseType {
         type ResponseType = GeoSearchResponse
     }
+    final case class MetaInfo(options: Seq[SiteInfoProps] = Seq(SiteInfoProps.General))
+        extends Query
+        with HasResponseType {
+        type ResponseType = MetaInfoResponse
+    }
+}
+
+enum SiteInfoProps {
+    case General
+    case Languages
+    case Statistics
 }

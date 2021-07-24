@@ -160,6 +160,60 @@ components:
           type: string
         globe:
           type: string
+    SummaryResponse:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: object
+          required:
+            - pages
+    MetaInfoResponse:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: object
+          required:
+           - general
+          properties:
+            general:
+              type: object
+              properties:
+                mainpage:
+                  type: string
+                base:
+                  type: string
+                sitename:
+                  type: string
+                lang:
+                  type: string
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageInfo'
+            statistics:
+              type: object
+              properties:
+                pages:
+                  type: int
+                articles:
+                  type: int
+                users:
+                  type: int
+                activeusers:
+                  type: int
+    LanguageInfo:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+
+          
       
 
             

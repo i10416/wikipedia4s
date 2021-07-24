@@ -10,13 +10,7 @@ class Test extends AnyFlatSpec with Matchers:
     implicit val ctx: APIContext = APIContext("en")
     val wiki = new Wikipedia4s[IO] {}
 
-    wiki.query(Query.Suggest("helloworld", 5)).unsafeRunSync() match {
-        case Right(result) => println(result)
-        case Left(fail)    => println(fail)
-    }
-    wiki.query(
-      Query.GeoSearch((37.789, -122.4), 500, 10, Some("wikipedia"), Some(Seq("coordinates")))
-    ).unsafeRunSync() match {
+    wiki.query(Query.MetaInfo(SiteInfoProps.values.toSeq)).unsafeRunSync() match {
         case Right(result) => println(result)
         case Left(fail)    => println(fail)
     }
