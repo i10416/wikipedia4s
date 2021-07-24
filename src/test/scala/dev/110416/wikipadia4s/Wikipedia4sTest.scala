@@ -9,7 +9,7 @@ class Test extends AnyFlatSpec with Matchers:
 
     implicit val ctx: APIContext = APIContext("en")
     val wiki = new Wikipedia4s[IO] {}
-
+ 
     wiki.query(Query.MetaInfo(SiteInfoProps.values.toSeq)).unsafeRunSync() match {
         case Right(result) => println(result)
         case Left(fail)    => println(fail)

@@ -18,6 +18,11 @@ wiki.query(Query.GeoSearch((37.789, -122.4), 500, 10, Some("wikipedia"))).unsafe
     case Right(result) => println(result)
     case Left(fail)    => println(fail)
 }
+
+wiki.query(Query.MetaInfo(SiteInfoProps.values.toSeq)).unsafeRunSync() match {
+    case Right(result) => println(result)
+    case Left(fail)    => println(fail)
+}
 ```
 
 Inspired by https://github.com/goldsmith/Wikipedia and https://github.com/intracer/scalawiki
