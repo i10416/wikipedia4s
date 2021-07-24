@@ -18,6 +18,7 @@ import sttp.model.Uri
 import sttp.model.Uri.UriContext
 
 import scala.concurrent.duration.*
+import cats.effect.kernel.Async
 
 type APIRequest[T] = RequestT[Identity, Either[
   ResponseException[String, io.circe.Error],
@@ -28,14 +29,15 @@ type APIResponse[T] = Response[Either[
   ResponseException[String, io.circe.Error],
   org.openapitools.client.model.ErrorResponse | T
 ]]
-trait Wikipedia4s(using ctx: APIContext) {
-    implicit val client: org.openapitools.client.api.DefaultApi = org.openapitools.client.api
+trait Wikipedia4s[F[_]:Async](using ctx: APIContext) {
+    val client: org.openapitools.client.api.DefaultApi = org.openapitools.client.api
         .DefaultApi(ctx.uri("http")(ctx.language))
 
     def query[T <: HasResponseType : BuildRequest](
         q: T
-    ): IO[Either[WikiError, q.ResponseType]] = {
-        AsyncHttpClientCatsBackend[IO]().flatMap { backend =>
+    ): F[Either[WikiError, q.ResponseType]] = {
+        implicit val c = client
+        AsyncHttpClientCatsBackend[F]().flatMap { backend =>
             {
                 for {
                     response <- summon[BuildRequest[T]].build(q).send(backend)

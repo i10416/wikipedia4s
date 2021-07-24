@@ -15,8 +15,13 @@ object Query {
     final case class Suggest(query: String, limit: Int) extends Query with HasResponseType {
         type ResponseType = SuggestResponse
     }
-    final case class GeoSearch(location: (Double, Double), radius: Int, limit: Int,titles:Option[String]=None,props:Option[Seq[String]]=None)
-        extends Query
+    final case class GeoSearch(
+        location: (Double, Double),
+        radius: Int,
+        limit: Int,
+        titles: Option[String] = None,
+        props: Option[Seq[String]] = None
+    ) extends Query
         with HasResponseType {
         type ResponseType = GeoSearchResponse
     }

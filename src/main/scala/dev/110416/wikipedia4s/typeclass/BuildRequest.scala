@@ -1,23 +1,23 @@
 package dev.`110416`.wikipedia4s
 import scala.concurrent.duration.*
-
+import org.openapitools.client.api.DefaultApi
+import org.openapitools.client.core.JsonSupport.*
+import sttp.client3.asynchttpclient.AsyncHttpClientBackend
 
 trait BuildRequest[T <: HasResponseType] {
     def build(t: T)(using
-        client: org.openapitools.client.api.DefaultApi,
+        client: DefaultApi,
         ctx: APIContext
     ): APIRequest[t.ResponseType]
 }
 
-
 given BuildRequest[Query.Search] with
     def build(
         q: Query.Search
-    )(using client: org.openapitools.client.api.DefaultApi, ctx: APIContext) = {
-        import org.openapitools.client.core.JsonSupport.*
+    )(using client: DefaultApi, ctx: APIContext) = {
 
         client
-            .wApiPhpGet[org.openapitools.client.model.SearchResponse](
+            .wApiPhpGet[q.ResponseType](
               ctx.USER_AGENT,
               "json",
               "query",
@@ -35,8 +35,7 @@ given BuildRequest[Query.Search] with
 given BuildRequest[Query.Suggest] with
     def build(
         q: Query.Suggest
-    )(using client: org.openapitools.client.api.DefaultApi, ctx: APIContext) = {
-        import org.openapitools.client.core.JsonSupport.*
+    )(using client: DefaultApi, ctx: APIContext) = {
 
         client
             .wApiPhpGet[q.ResponseType](
@@ -54,8 +53,7 @@ given BuildRequest[Query.Suggest] with
 
     }
 given BuildRequest[Query.GeoSearch] with
-  def build(q:Query.GeoSearch)(using client: org.openapitools.client.api.DefaultApi, ctx: APIContext) = {
-        import org.openapitools.client.core.JsonSupport.*
+    def build(q: Query.GeoSearch)(using client: DefaultApi, ctx: APIContext) = {
 
         client
             .wApiPhpGet[q.ResponseType](
@@ -65,10 +63,10 @@ given BuildRequest[Query.GeoSearch] with
               Map(
                 "gsradius" -> q.radius.toString,
                 "list" -> "geosearch",
-                "gscoord"-> s"${q.location._1}|${q.location._2}",
+                "gscoord" -> s"${q.location._1}|${q.location._2}",
                 "gslimit" -> q.limit.toString,
                 "titles" -> q.titles.getOrElse("")
               )
             )
             .readTimeout(5.seconds)
-        }
+    }
