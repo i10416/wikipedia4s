@@ -38,4 +38,5 @@ On compilation, a client implementation and models are generated from protocol/o
 - Search
 - GeoSearch
 - Suggest
+- SiteInfo
 
