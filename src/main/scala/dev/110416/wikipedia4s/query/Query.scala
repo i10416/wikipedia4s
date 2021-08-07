@@ -3,6 +3,7 @@ package dev.`110416`.wikipedia4s
 import org.openapitools.client.model.{ GeoSearchResponse, SearchResponse }
 import org.openapitools.client.model.SuggestResponse
 import org.openapitools.client.model.MetaInfoResponse
+import java.time.LocalDate
 
 trait HasResponseType {
     type ResponseType

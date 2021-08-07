@@ -1,6 +1,4 @@
 package dev.`110416`.wikipedia4s
-import sttp.model.Uri
-import sttp.model.Uri.PathSegment
 
 case class APIContext(var language: String = "en") {
     val uri: String =>String=> String =

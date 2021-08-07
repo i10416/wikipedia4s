@@ -27,6 +27,7 @@ lazy val protocol = project
       scalaVersion := scala3Version,
       crossScalaVersions := Seq(scala3Version),
       openApiInputSpec := (baseDirectory.value / "openapi.yaml").toString,
+      // See https://openapi-generator.tech/docs/generators/scala-sttp/
       openApiConfigFile := (baseDirectory.value / "openapi_config.json").toString,
       openApiTemplateDir := (baseDirectory.value / "template").toString,
       openApiGeneratorName := "scala-sttp",

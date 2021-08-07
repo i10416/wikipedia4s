@@ -1,6 +1,4 @@
 package dev.`110416`.wikipedia4s
-import cats.data.EitherT
-import cats.effect.IO
 import cats.implicits.*
 import dev.`110416`.wikipedia4s.errors.*
 import sttp.client3.DeserializationException
@@ -9,13 +7,8 @@ import sttp.client3.Identity
 import sttp.client3.RequestT
 import sttp.client3.Response
 import sttp.client3.ResponseException
-import sttp.client3.SttpBackend
-import sttp.client3.SttpClientException
 import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import sttp.client3.basicRequest
-import sttp.model.Method
-import sttp.model.Uri
-import sttp.model.Uri.UriContext
 
 import scala.concurrent.duration.*
 import cats.effect.kernel.Async
